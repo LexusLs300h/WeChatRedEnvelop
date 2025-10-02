@@ -7,45 +7,26 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-tweak:
+  build:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
 
-      - name: Install dependencies
+      - name: Check cache
         run: |
-          brew update
-          brew install make git ldid xz
-          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          echo upstream_heads=`git ls-remote https://github.com/LexusLs300h/theos.git | head -n 1 | cut -f 1`-`git ls-remote https://github.com/LexusLs300h/sdks | head -n 1 | cut -f 1` >> $GITHUB_ENV
+      - name: Use cache
+        id: cache
+        uses: actions/cache@v4.2.1
+        with:
+          path: ${{ github.workspace }}/theos
+          key: ${{ runner.os }}-${{ env.upstream_heads }}
 
-      - name: Install and verify Theos (stable version)
-        run: |
-          # 定义Theos安装路径
-          THEOS_PATH="/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          
-          # 强制删除现有目录（如果存在）
-          rm -rf "$THEOS_PATH"
-          
-          # 克隆Theos的稳定版本（使用2023年12月的稳定标签）
-          # 该版本经验证包含master.mk关键文件
-          git clone --recursive -b 2023.12.09 https://github.com/theos/theos.git "$THEOS_PATH"
-          
-          # 验证目录是否存在
-          if [ ! -d "$THEOS_PATH" ]; then
-            echo "Error: Theos directory not created!"
-            exit 1
-          fi
-          
-          # 验证关键文件master.mk是否存在
-          if [ ! -f "$THEOS_PATH/makefiles/master.mk" ]; then
-            echo "Error: Critical file master.mk not found in Theos directory!"
-            exit 1
-          fi
-          
-          echo "Theos installed and verified successfully"
-
+      - name: Prepare theos
+        uses: huami1314/theos-action@main
       - name: Build Tweak
         run: |
           # 指定Theos路径
