@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-#define kBundlePath @"/Library/MobileSubstrate/DynamicLibraries/com.swiftyper.wechatredenvelop.bundle"
+#define kBundlePath [[NSBundle mainBundle] pathForResource:@"com.swiftyper.wechatredenvelop" ofType:@"bundle"]
 
 #pragma mark - Util
 
