@@ -22,20 +22,13 @@ jobs:
 
       - name: Verify existing Theos directory
         run: |
-          # 强制删除Theos目录（确保彻底清理）
+          # 强制删除Theos目录
           rm -rf "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          # 检查Theos是否存在，不存在则克隆安装
-          if [ ! -d "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos" ]; then
-            git clone --recursive https://github.com/theos/theos.git "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          fi
-          # 检查已存在的Theos目录是否有效
-          if [ ! -d "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos" ]; then
-            echo "Error: Theos directory not found!"
-            exit 1
-          fi
-          # 验证关键文件是否存在（确保目录可用）
+          # 克隆Theos并同步子模块
+          git clone --recursive https://github.com/theos/theos.git "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          # 验证关键文件是否存在
           if [ ! -f "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos/makefiles/master.mk" ]; then
-            echo "Error: Invalid Theos directory!"
+            echo "Error: Theos directory is invalid, master.mk not found!"
             exit 1
           fi
 
