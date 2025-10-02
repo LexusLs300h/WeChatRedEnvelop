@@ -2,68 +2,46 @@ name: Build Debian Package
 
 on:
   push:
-    tags:
-      - 'v*'
-  release:
-    types: [published]
-  workflow_dispatch:
-
-env:
-  PACKAGE_NAME: "your-package-name"
-  VERSION: ${{ github.ref_name }}
+    branches: [ main, master ]  # 触发构建的分支
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        architecture: [amd64, arm64]
+  build-deb:
+    runs-on: ubuntu-latest  # 使用 Ubuntu 环境，原生支持 deb 构建
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # 1. 检出代码仓库
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 确保获取完整历史，可能影响版本号生成
 
-    - name: Set up environment
-      run: |
-        # 移除 'v' 前缀（如果存在）
-        VERSION=${GITHUB_REF#refs/tags/v}
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "PACKAGE_NAME=myapp" >> $GITHUB_ENV
+      # 2. 安装构建依赖 (根据实际需求调整依赖包)
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            devscripts \
+            debhelper \
+            dh-make \
+            fakeroot  # 核心依赖包，按需添加其他如 gcc、make 等
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          devscripts \
-          debhelper \
-          dh-make \
-          build-essential \
-          fakeroot \
-          lintian
+      # 3. 构建 Debian 包 (关键步骤)
+      - name: Build the DEB package
+        run: |
+          # 进入源代码目录 (根据你的项目结构调整路径)
+          cd ./src  # 替换为实际源代码路径
+          # 执行构建，-us -uc 表示不签名 (用于测试，正式发布需配置 GPG)
+          dpkg-buildpackage -us -uc -b
 
-    - name: Create Debian packaging structure
-      run: |
-        # 创建基本的 Debian 包结构
-        dh_make --createorig --yes --single --packagename ${PACKAGE_NAME}_${VERSION}
-
-    - name: Copy custom Debian files
-      run: |
-        cp -r debian/* ${PACKAGE_NAME}-${VERSION}/debian/
-
-    - name: Build package
-      run: |
-        cd ${PACKAGE_NAME}-${VERSION}
-        dpkg-buildpackage -us -uc -b
-
-    - name: Check package with Lintian
-      run: |
-        lintian ${PACKAGE_NAME}_${VERSION}_*.deb
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.PACKAGE_NAME }}-${{ env.VERSION }}-${{ matrix.architecture }}
-        path: |
-          *.deb
-          *.changes
-          *.buildinfo
+      # 4. 归档构建产物 (deb 文件)
+      - name: Archive DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-packages
+          path: |
+            ../*.deb  # dpkg-buildpackage 会在上级目录生成 deb 文件
+            ../*.changes
+            ../*.buildinfo
