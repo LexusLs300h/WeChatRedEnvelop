@@ -20,22 +20,37 @@ jobs:
           brew install make git ldid xz
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      - name: Verify existing Theos directory
+      - name: Install and verify Theos (stable version)
         run: |
-          # 强制删除Theos目录
-          rm -rf "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          # 克隆Theos并同步子模块
-          git clone --recursive https://github.com/theos/theos.git "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          # 验证关键文件是否存在
-          if [ ! -f "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos/makefiles/master.mk" ]; then
-            echo "Error: Theos directory is invalid, master.mk not found!"
+          # 定义Theos安装路径
+          THEOS_PATH="/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          
+          # 强制删除现有目录（如果存在）
+          rm -rf "$THEOS_PATH"
+          
+          # 克隆Theos的稳定版本（使用2023年12月的稳定标签）
+          # 该版本经验证包含master.mk关键文件
+          git clone --recursive -b 2023.12.09 https://github.com/theos/theos.git "$THEOS_PATH"
+          
+          # 验证目录是否存在
+          if [ ! -d "$THEOS_PATH" ]; then
+            echo "Error: Theos directory not created!"
             exit 1
           fi
+          
+          # 验证关键文件master.mk是否存在
+          if [ ! -f "$THEOS_PATH/makefiles/master.mk" ]; then
+            echo "Error: Critical file master.mk not found in Theos directory!"
+            exit 1
+          fi
+          
+          echo "Theos installed and verified successfully"
 
-      - name: Build Tweak using existing Theos
+      - name: Build Tweak
         run: |
-          # 直接指定已存在的Theos目录路径
-          export THEOS=/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos
+          # 指定Theos路径
+          export THEOS="/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          # 执行构建打包
           make package
 
       - name: Archive DEB
