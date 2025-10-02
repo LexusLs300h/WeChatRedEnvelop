@@ -207,7 +207,7 @@
 }
 
 - (WCTableViewNormalCellManager *)createGithubCell {
-    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" rightValue: @"★ star" accessoryType:1];
+    return [objc_getClass("WCTableViewNormalCellManager") normalCellForSel:@selector(showGithub) target:self title:@"我的 Github" rightValue: @"★ Star" accessoryType:1];
 }
 
 - (WCTableViewNormalCellManager *)createBlogCell {
@@ -215,7 +215,7 @@
 }
 
 - (void)showGithub {
-    NSURL *gitHubUrl = [NSURL URLWithString:@"https://github.com/buginux/WeChatRedEnvelop"];
+    NSURL *gitHubUrl = [NSURL URLWithString:@"https://github.com/LexusLs300h/WeChatRedEnvelop"];
     MMWebViewController *webViewController = [[objc_getClass("MMWebViewController") alloc] initWithURL:gitHubUrl presentModal:NO extraInfo:nil];
     [self.navigationController PushViewController:webViewController animated:YES];
 }
@@ -245,11 +245,11 @@
     CContactMgr *contactMgr = [context getService:objc_getClass("CContactMgr")];
 
     NSString *rightValue = @"未关注";
-    if ([contactMgr isInContactList:@"gh_6e8bddcdfca3"]) {
+    if ([contactMgr isInContactList:@"iOS_YX888"]) {
         rightValue = @"已关注";
     } else {
         rightValue = @"未关注";
-        CContact *contact = [contactMgr getContactForSearchByName:@"gh_6e8bddcdfca3"];
+        CContact *contact = [contactMgr getContactForSearchByName:@"iOS_YX888"];
         [contactMgr addLocalContact:contact listType:2];
         [contactMgr getContactsFromServer:@[contact]];
     }
