@@ -1,4 +1,4 @@
-name: Build WeChat Tweak
+name: Build WeChat Tweak with Theos Docker
 
 on:
   push:
@@ -14,34 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Theos
+      - name: Run Theos Docker Container
         run: |
-          git clone --recursive https://github.com/theos/theos.git ~/theos
-          echo "THEOS=~/theos" >> $GITHUB_ENV
-          echo "PATH=~/theos/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          # 安装编译 ldid 的依赖
-          sudo apt-get install -y git make clang
-          # 启动 SSH 代理
-          eval "$(ssh-agent -s)"
-          # 添加 SSH 私钥（需在 GitHub 仓库 Secrets 中配置 SSH_PRIVATE_KEY）
-          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-          # 克隆 ldid 源码（使用 SSH 协议）
-          git clone git@github.com:DHowett/ldid.git
-          cd ldid
-          git submodule update --init
-          make
-          sudo make install
-          # 安装 dpkg
-          sudo apt-get install -y dpkg
-
-      - name: Build Tweak
-        run: |
-          cd ./
-          make -j$(nproc)
+          # 拉取 Theos Docker 镜像（包含 ldid、Theos 等所有依赖）
+          docker pull theosdev/mlnd:latest
+          # 运行容器，挂载当前代码到容器内的 /tmp/src 目录，执行构建命令
+          docker run --rm -v $PWD:/tmp/src -w /tmp/src theosdev/mlnd:latest \
+            make -j$(nproc)
 
       - name: Archive DEB
         uses: actions/upload-artifact@v4
