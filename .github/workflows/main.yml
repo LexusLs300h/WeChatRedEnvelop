@@ -23,9 +23,8 @@ jobs:
 
       - name: Clean existing Theos directory
         run: |
-          # 清理可能存在的Theos目录，解决目录冲突问题
-          if [ -d "$HOME/theos" ]; then
-            rm -rf "$HOME/theos"
+          if [ -d "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos" ]; then
+            rm -rf "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
           fi
 
       - name: Prepare Theos
