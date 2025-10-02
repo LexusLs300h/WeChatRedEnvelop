@@ -19,6 +19,10 @@ jobs:
           brew update
           brew install make git
 
+      # 添加清理Theos目录的步骤
+      - name: Clean existing Theos dir
+        run: rm -rf ${{ github.workspace }}/theos
+
       - name: Prepare Theos
         uses: huami1314/theos-action@main
 
