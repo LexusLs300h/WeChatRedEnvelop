@@ -48,15 +48,58 @@
     self.finished = NO;
 }
 
+// 在WBReceiveRedEnvelopOperation.m中
+- (void)start {
+    if (self.isCancelled) {
+        self.finished = YES;
+        return;
+    }
+    [self willChangeValueForKey:@"isExecuting"];
+    _executing = YES;
+    [self didChangeValueForKey:@"isExecuting"];
+    
+    [self performSelectorInBackground:@selector(main) withObject:nil];
+}
+
 - (void)main {
-    sleep(self.delaySeconds);
+    @autoreleasepool {
+        sleep(self.delaySeconds);
+        // 执行抢红包逻辑...
+        
+        [self willChangeValueForKey:@"isExecuting"];
+        _executing = NO;
+        [self didChangeValueForKey:@"isExecuting"];
+        
+        [self willChangeValueForKey:@"isFinished"];
+        _finished = YES;
+        [self didChangeValueForKey:@"isFinished"];
+    }
+}// 在WBReceiveRedEnvelopOperation.m中
+- (void)start {
+    if (self.isCancelled) {
+        self.finished = YES;
+        return;
+    }
+    [self willChangeValueForKey:@"isExecuting"];
+    _executing = YES;
+    [self didChangeValueForKey:@"isExecuting"];
     
-    MMContext *context =  [objc_getClass("MMContext") activeUserContext];
-    WCRedEnvelopesLogicMgr *logicMgr = [context getService:objc_getClass("WCRedEnvelopesLogicMgr")];
-    [logicMgr OpenRedEnvelopesRequest:[self.redEnvelopParam toParams]];
-    
-    self.finished = YES;
-    self.executing = NO;
+    [self performSelectorInBackground:@selector(main) withObject:nil];
+}
+
+- (void)main {
+    @autoreleasepool {
+        sleep(self.delaySeconds);
+        // 执行抢红包逻辑...
+        
+        [self willChangeValueForKey:@"isExecuting"];
+        _executing = NO;
+        [self didChangeValueForKey:@"isExecuting"];
+        
+        [self willChangeValueForKey:@"isFinished"];
+        _finished = YES;
+        [self didChangeValueForKey:@"isFinished"];
+    }
 }
 
 - (void)cancel {
