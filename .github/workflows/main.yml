@@ -1,55 +1,37 @@
-name: Build Debian Package
+name: Build WeChat Tweak
 
 on:
   push:
-    branches: [ main, master ]  # 触发构建的分支
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
-  build-deb:
-    runs-on: ubuntu-latest  # 使用 Ubuntu 环境，原生支持 deb 构建
+  build-tweak:
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出代码仓库
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 确保获取完整历史，可能影响版本号生成
 
-      # 2. 安装构建依赖 (根据实际需求调整依赖包)
-      - name: Install build dependencies
+      - name: Set up Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git ~/theos
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+          echo "PATH=~/theos/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            devscripts \
-            debhelper \
-            dh-make \
-            fakeroot  # 核心依赖包，按需添加其他如 gcc、make 等
+          sudo apt-get install -y ldid dpkg # ldid 用于 iOS 签名，dpkg 用于处理 deb 包
 
-      # 3. 创建 Debian 包基础结构（生成 changelog 等文件）
-      - name: Create Debian structure
+      - name: Build Tweak
         run: |
-          # 进入源代码目录 (根据你的项目结构调整路径，这里假设源代码在仓库根目录)
           cd ./
-          # 替换为实际的包名和版本号，格式为 "包名_版本号"
-          dh_make --createorig --yes --single -p your-package-name_1.0.0
+          make -j$(nproc)
 
-      # 4. 构建 Debian 包 (关键步骤)
-      - name: Build the DEB package
-        run: |
-          # 进入源代码目录 (根据你的项目结构调整路径，这里假设源代码在仓库根目录)
-          cd ./
-          # 执行构建，-us -uc 表示不签名 (用于测试，正式发布需配置 GPG)
-          dpkg-buildpackage -us -uc -b
-
-      # 5. 归档构建产物 (deb 文件)
-      - name: Archive DEB artifact
+      - name: Archive DEB
         uses: actions/upload-artifact@v4
         with:
-          name: debian-packages
-          path: |
-            ../*.deb  # dpkg-buildpackage 会在上级目录生成 deb 文件
-            ../*.changes
-            ../*.buildinfo
+          name: wechat-tweak-deb
+          path: ./packages/*.deb
