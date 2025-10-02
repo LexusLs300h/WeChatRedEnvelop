@@ -28,6 +28,14 @@ jobs:
           echo "THEOS=~/theos" >> $GITHUB_ENV
           echo "PATH=~/theos/bin:$PATH" >> $GITHUB_ENV
 
+      - name: Set up Theos Linux toolchain
+        run: |
+          TOOLCHAIN_DIR=~/theos/toolchain/linux/iphone
+          mkdir -p $TOOLCHAIN_DIR
+          wget https://github.com/theos/toolchain/releases/download/2023.09.10/linux-toolchain.tar.xz -O /tmp/linux-toolchain.tar.xz
+          tar -xf /tmp/linux-toolchain.tar.xz -C $TOOLCHAIN_DIR --strip-components=1
+          rm /tmp/linux-toolchain.tar.xz
+
       - name: Download iOS SDK
         run: |
           mkdir -p ~/theos/sdks
