@@ -17,17 +17,18 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install make git
-
-      # 添加清理Theos目录的步骤
-      - name: Clean existing Theos dir
-        run: rm -rf ${{ github.workspace }}/theos
+          brew install make git ldid xz # 增加ldid和xz依赖
+          # 安装Theos依赖
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
       - name: Prepare Theos
         uses: huami1314/theos-action@main
+        with:
+          theos-version: latest # 指定Theos版本
 
       - name: Build Tweak
         run: |
+          export THEOS=$HOME/theos # 确保Theos路径正确
           make package
 
       - name: Archive DEB
