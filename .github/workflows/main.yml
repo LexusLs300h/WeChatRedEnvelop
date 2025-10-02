@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.upstream_heads }}
 
       - name: Prepare theos
-        uses: huami1314/theos-action@main
+        uses: LexusLs300h/theos-action@main
       - name: Build Tweak
         run: |
           # 指定Theos路径
