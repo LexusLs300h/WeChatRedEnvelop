@@ -27,6 +27,13 @@ jobs:
           git clone --recursive https://github.com/theos/theos.git ~/theos
           echo "THEOS=~/theos" >> $GITHUB_ENV
           echo "PATH=~/theos/bin:$PATH" >> $GITHUB_ENV
+          
+      - name: Download iOS SDK
+        run: |
+          mkdir -p ~/theos/sdks
+          wget -O ~/theos/sdks/iPhoneOS13.5.sdk.tar.gz https://github.com/theos/sdks/releases/download/13.5/iPhoneOS13.5.sdk.tar.gz
+          tar -xzf ~/theos/sdks/iPhoneOS13.5.sdk.tar.gz -C ~/theos/sdks
+          rm ~/theos/sdks/iPhoneOS13.5.sdk.tar.gz
 
       - name: Build Tweak
         run: |
