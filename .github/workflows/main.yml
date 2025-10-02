@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branchess: [ main, master ]
 
 jobs:
   build-tweak:
@@ -17,14 +17,23 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install make git ldid xz # 增加ldid和xz依赖
-          # 安装Theos依赖
+          brew install make git ldid xz # 确保依赖安装完整
+          # 确保Xcode命令行工具正确配置
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Clean existing Theos directory
+        run: |
+          # 清理可能存在的Theos目录，解决目录冲突问题
+          if [ -d "$HOME/theos" ]; then
+            rm -rf "$HOME/theos"
+          fi
 
       - name: Prepare Theos
         uses: huami1314/theos-action@main
         with:
-          theos-version: latest # 指定Theos版本
+          # 修正参数错误，使用支持的参数代替theos-version
+          theos-src: https://github.com/theos/theos.git
+          theos-sdks: https://github.com/theos/sdks.git
 
       - name: Build Tweak
         run: |
@@ -36,3 +45,4 @@ jobs:
         with:
           name: wechat-tweak-deb
           path: ./packages/*.deb
+
