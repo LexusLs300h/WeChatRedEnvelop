@@ -6,6 +6,9 @@ TARGET = iphone:latest:8.0
 BUNDLE_NAME = com.swiftyper.wechatredenvelop
 com.swiftyper.wechatredenvelop_INSTALL_PATH = /Library/MobileSubstrate/DynamicLibraries
 
+THEOS_PACKAGE_SCHEME = rootless
+com.swiftyper.wechatredenvelop_INSTALL_PATH = /var/jb/Library/MobileSubstrate/DynamicLibraries
+
 include $(THEOS)/makefiles/common.mk
 include $(THEOS)/makefiles/bundle.mk
 
