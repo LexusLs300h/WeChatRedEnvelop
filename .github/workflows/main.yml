@@ -16,10 +16,10 @@ jobs:
 
       - name: Run Theos Docker Container
         run: |
-          # 拉取 Theos Docker 镜像（包含 ldid、Theos 等所有依赖）
-          docker pull theosdev/mlnd:latest
+          # 拉取 Theos 官方 Docker 镜像
+          docker pull theosdev/theos:latest
           # 运行容器，挂载当前代码到容器内的 /tmp/src 目录，执行构建命令
-          docker run --rm -v $PWD:/tmp/src -w /tmp/src theosdev/mlnd:latest \
+          docker run --rm -v $PWD:/tmp/src -w /tmp/src theosdev/theos:latest \
             make -j$(nproc)
 
       - name: Archive DEB
