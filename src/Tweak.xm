@@ -5,6 +5,8 @@
 #import "WBRedEnvelopTaskManager.h"
 #import "WBRedEnvelopConfig.h"
 #import "WBRedEnvelopParamQueue.h"
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 %hook MicroMessengerAppDelegate
 
