@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-tweak:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -16,38 +16,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git make clang dpkg
-          wget https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_linux_x86_64
-          chmod +x ldid_linux_x86_64
-          sudo mv ldid_linux_x86_64 /usr/local/bin/ldid
+          brew update
+          brew install make git
 
-      - name: Set up Theos
-        run: |
-          git clone --recursive https://github.com/theos/theos.git ~/theos
-          echo "THEOS=~/theos" >> $GITHUB_ENV
-          echo "PATH=~/theos/bin:$PATH" >> $GITHUB_ENV
-
-      - name: Set up Theos Linux toolchain
-        run: |
-          TOOLCHAIN_DIR=~/theos/toolchain/linux/iphone
-          mkdir -p $TOOLCHAIN_DIR
-          wget https://github.com/theos/toolchain/releases/download/2022.07.03/linux-toolchain.tar.xz
-          tar -xf /tmp/linux-toolchain.tar.xz -C $TOOLCHAIN_DIR --strip-components=1
-          rm /tmp/linux-toolchain.tar.xz
-
-      - name: Download iOS SDK
-        run: |
-          mkdir -p ~/theos/sdks
-          wget https://github.com/theos/sdks/archive/refs/heads/master.zip -O ~/theos/sdks/sdks.zip
-          unzip ~/theos/sdks/sdks.zip -d ~/theos/sdks/
-          cp -r ~/theos/sdks/sdks-master/* ~/theos/sdks/
-          rm -rf ~/theos/sdks/sdks.zip ~/theos/sdks/sdks-master
+      - name: Prepare Theos
+        uses: huami1314/theos-action@main
 
       - name: Build Tweak
         run: |
-          cd ./
-          make -j$(nproc)
+          make package
 
       - name: Archive DEB
         uses: actions/upload-artifact@v4
