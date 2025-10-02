@@ -22,6 +22,10 @@ jobs:
 
       - name: Verify existing Theos directory
         run: |
+          # 先删除已存在的Theos目录（如果存在）
+          if [ -d "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos" ]; then
+            rm -rf "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          fi
           # 检查Theos是否存在，不存在则克隆安装
           if [ ! -d "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos" ]; then
             git clone --recursive https://github.com/theos/theos.git /Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos
