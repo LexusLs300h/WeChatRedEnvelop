@@ -23,7 +23,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ldid dpkg # ldid 用于 iOS 签名，dpkg 用于处理 deb 包
+          # 安装编译 ldid 的依赖
+          sudo apt-get install -y git make clang
+          # 克隆 ldid 源码并编译安装
+          git clone https://github.com/DHowett/ldid.git
+          cd ldid
+          git submodule update --init
+          make
+          sudo make install
+          # 安装 dpkg
+          sudo apt-get install -y dpkg
 
       - name: Build Tweak
         run: |
