@@ -32,7 +32,7 @@ jobs:
       - name: Create Debian structure
         run: |
           # 进入源代码目录 (根据你的项目结构调整路径，这里假设源代码在仓库根目录)
-          cd ./src
+          cd ./
           # 替换为实际的包名和版本号，格式为 "包名_版本号"
           dh_make --createorig --yes --single -p your-package-name_1.0.0
 
@@ -40,7 +40,7 @@ jobs:
       - name: Build the DEB package
         run: |
           # 进入源代码目录 (根据你的项目结构调整路径，这里假设源代码在仓库根目录)
-          cd ./src
+          cd ./
           # 执行构建，-us -uc 表示不签名 (用于测试，正式发布需配置 GPG)
           dpkg-buildpackage -us -uc -b
 
