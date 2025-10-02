@@ -7,33 +7,34 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  build-tweak:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
-        with:
-          submodules: true
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Check cache
+      - name: Install dependencies
         run: |
-          echo upstream_heads=`git ls-remote https://github.com/LexusLs300h/theos.git | head -n 1 | cut -f 1`-`git ls-remote https://github.com/LexusLs300h/sdks | head -n 1 | cut -f 1` >> $GITHUB_ENV
-      - name: Use cache
-        id: cache
-        uses: actions/cache@v4.2.1
-        with:
-          path: ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-${{ env.upstream_heads }}
-
-      - name: Prepare theos
-        uses: LexusLs300h/theos-action@main
-      - name: Build Tweak
+          brew update
+          brew install make git ldid xz
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+      - name: Verify existing Theos directory
         run: |
-          # 指定Theos路径
-          export THEOS="/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
-          # 执行构建打包
+          # 强制删除Theos目录
+          rm -rf "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          # 克隆Theos并同步子模块
+          git clone --recursive https://github.com/LexusLs300h/theos.git "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos"
+          # 验证关键文件是否存在
+          if [ ! -f "/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos/makefiles/master.mk" ]; then
+            echo "Error: Theos directory is invalid, master.mk not found!"
+            exit 1
+          fi
+      - name: Build Tweak using existing Theos
+        run: |
+          # 直接指定已存在的Theos目录路径
+          export THEOS=/Users/runner/work/WeChatRedEnvelop/WeChatRedEnvelop/theos
           make package
-
       - name: Archive DEB
         uses: actions/upload-artifact@v4
         with:
